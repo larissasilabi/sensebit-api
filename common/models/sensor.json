@@ -1,0 +1,49 @@
+{
+  "name": "sensor",
+  "plural": "sensores",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "tipo": {
+      "type": "number",
+      "required": true
+    },
+    "guid": {
+      "type": "string",
+      "required": true
+    },
+    "status": {
+      "type": "number",
+      "required": true
+    },
+    "usuarioId": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "parametros": {
+      "type": "hasOne",
+      "model": "parametro",
+      "foreignKey": "sensorId"
+    },
+    "logSensores": {
+      "type": "hasMany",
+      "model": "logSensor",
+      "foreignKey": "sensorId",
+      "through": "logSensor"
+    },
+    "logAcoes": {
+      "type": "hasMany",
+      "model": "logAcao",
+      "foreignKey": "sensorId",
+      "through": "logAcao"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

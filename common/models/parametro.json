@@ -1,0 +1,50 @@
+{
+  "name": "parametro",
+  "plural": "parametros",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "sensorId": {
+      "type": "number",
+      "required": true
+    },
+    "descricao": {
+      "type": "string"
+    },
+    "operadorMinimo": {
+      "type": "string",
+      "required": true
+    },
+    "valorMinimo": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "operadorMaximo": {
+      "type": "string",
+      "required": true
+    },
+    "valorMaximo": {
+      "type": "number",
+      "required": true,
+      "default": 0
+    },
+    "acaoId": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "acoes": {
+      "type": "hasOne",
+      "model": "acao",
+      "foreignKey": "acaoId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

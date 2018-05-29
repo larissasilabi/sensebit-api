@@ -1,0 +1,27 @@
+{
+  "name": "logSensor",
+  "plural": "logSensores",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "sensorId": {
+      "type": "number",
+      "required": true
+    },
+    "data": {
+      "type": "date",
+      "required": true
+    },
+    "valor": {
+      "type": "number",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}
