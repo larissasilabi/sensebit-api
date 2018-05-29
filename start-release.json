@@ -1,0 +1,10 @@
+{
+  "name": "api",
+  "cwd": "/var/www/api",
+  "script": ".",
+  "watch": true,
+  "env": {
+    "NODE_ENV": "release"
+  },
+  "log_date_format": "YYYY-MM-DD HH:mm Z"
+}

@@ -1,0 +1,30 @@
+{
+  "name": "usuario",
+  "plural": "usuarios",
+  "base": "User",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "nome": {
+      "type": "string",
+      "required": true
+    },
+    "login": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "sensores": {
+      "type": "hasMany",
+      "model": "sensor",
+      "foreignKey": "usuarioId",
+      "through": "sensor"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

@@ -1,0 +1,36 @@
+// Use IntelliSense to learn about possible Node.js debug attributes.
+// Hover to view descriptions of existing attributes.
+// For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+{
+ "version": "0.2.0",
+ "configurations": [
+
+   {
+     "type": "node",
+     "request": "launch",
+     "env": {
+       "NODE_ENV": "release"
+     },
+     "name": "release",
+     "program": "${workspaceRoot}\\server\\server.js"
+   },
+   {
+     "type": "node",
+     "request": "launch",
+     "env": {
+       "NODE_ENV": "production"
+     },
+     "name": "production",
+     "program": "${workspaceRoot}\\server\\server.js"
+   },
+   {
+     "type": "node",
+     "request": "launch",
+     "env": {
+       "NODE_ENV": "development"
+     },
+     "name": "development",
+     "program": "${workspaceRoot}\\server\\server.js"
+   }
+ ]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "logAcao",
+  "plural": "logAcoes",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "sensorId": {
+      "type": "number",
+      "required": true
+    },
+    "acaoId": {
+      "type": "number",
+      "required": true
+    },
+    "data": {
+      "type": "date",
+      "required": true
+    },
+    "status": {
+      "type": "boolean",
+      "required": true
+    },
+    "descricao": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {},
+  "acls": [],
+  "methods": {}
+}

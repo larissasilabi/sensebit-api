@@ -1,0 +1,30 @@
+{
+  "name": "acao",
+  "plural": "acoes",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "tipo": {
+      "type": "number",
+      "required": true
+    },
+    "configuracao": {
+      "type": "string",
+      "required": true
+    }
+  },
+  "validations": [],
+  "relations": {
+    "logAcoes": {
+      "type": "hasMany",
+      "model": "logAcao",
+      "foreignKey": "acaoId",
+      "through": "logAcao"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}
