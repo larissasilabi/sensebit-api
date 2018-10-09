@@ -11,6 +11,10 @@
       "type": "number",
       "required": true
     },
+    "nome": {
+      "type": "string",
+      "required": false
+    },
     "guid": {
       "type": "string",
       "required": true
@@ -42,6 +46,12 @@
       "model": "logAcao",
       "foreignKey": "sensorId",
       "through": "logAcao"
+    },
+    "usuario": {
+      "type": "hasOne",
+      "model": "usuario",
+      "foreignKey": "id",
+      "through": "usuario"
     }
   },
   "acls": [],

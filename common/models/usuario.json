@@ -3,10 +3,13 @@
   "plural": "usuarios",
   "base": "User",
   "idInjection": true,
+  "restrictResetPasswordTokenScope": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
+    "realm": false,
+    "username": null,
     "nome": {
       "type": "string",
       "required": true
@@ -14,17 +17,51 @@
     "login": {
       "type": "string",
       "required": true
+    },
+    "telefone": {
+      "type": "string",
+      "required": false
     }
   },
   "validations": [],
   "relations": {
-    "sensores": {
-      "type": "hasMany",
-      "model": "sensor",
-      "foreignKey": "usuarioId",
-      "through": "sensor"
-    }
   },
-  "acls": [],
+  "acls": [
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "DENY"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "create"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$owner",
+      "permission": "ALLOW",
+      "property": "deleteById"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "login"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "logout"
+    },
+    {
+      "principalType": "ROLE",
+      "principalId": "$everyone",
+      "permission": "ALLOW",
+      "property": "find"
+    }
+  ],
   "methods": {}
 }

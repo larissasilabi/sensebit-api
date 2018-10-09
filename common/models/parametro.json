@@ -43,6 +43,12 @@
       "type": "hasOne",
       "model": "acao",
       "foreignKey": "acaoId"
+    },
+    "sensor": {
+      "type": "hasOne",
+      "model": "sensor",
+      "foreignKey": "sensorId",
+      "through": "sensor"
     }
   },
   "acls": [],

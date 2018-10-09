@@ -25,38 +25,38 @@
     "public": false
   },
   "RoleMapping": {
-    "dataSource": "db",
+    "dataSource": "postgres",
     "public": false,
     "options": {
       "strictObjectIDCoercion": true
     }
   },
   "Role": {
-    "dataSource": "db",
+    "dataSource": "postgres",
     "public": false
   },
   "sensor": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   },
   "usuario": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   },
   "parametro": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   },
   "logSensor": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   },
   "acao": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   },
   "logAcao": {
-    "dataSource": "sensebit",
+    "dataSource": "postgres",
     "public": true
   }
 }
