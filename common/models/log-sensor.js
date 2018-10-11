@@ -13,127 +13,154 @@ module.exports = function (Logsensor) {
     Logsensor.disableRemoteMethodByName(methodName);
   });
 
-  Logsensor.sendInformation = function (guid, valor, cb) {
+  Logsensor.sendInformation = async function (guid, valor, cb) {
+
     var Sensor = app.models.Sensor;
-    Sensor.find({
-      where: {
-        guid: guid,
-      },
-      include: ['parametros', 'usuario'],
-    }, (err, sensor) => {
-      if (err) cb(err);
-      if (sensor.length === 0) {
-        var error = new Error();
-        error.message = 'Sensor não encontrado';
-        error.status = 404;
-        cb(error);
-      } else {
-        Logsensor.create({
-          sensorId: sensor[0].id,
-          valor: valor,
-        }, (err) => {
-          if (err) {
-            cb(err, sensor);
-          } else {
-            var Sensor = app.models.Sensor;
-            var parametro, usuario;
-            sensor = JSON.parse(JSON.stringify(sensor[0]));
-            parametro = sensor.parametros;
-            usuario = sensor.usuario;
-            var aviso = false;
-            switch (parametro.operadorMinimo) {
-              case '0':
-                if (parametro.valorMinimo > valor) {
-                  aviso = true;
-                }
-                break;
-              case '1':
-                if (parametro.valorMinimo >= valor) {
-                  aviso = true;
-                }
-                break;
-              case '2':
-                if (parametro.valorMinimo === valor) {
-                  aviso = true;
-                }
-                break;
-              case '3':
-                if (parametro.valorMinimo < valor) {
-                  aviso = true;
-                }
-                break;
-              case '4':
-                if (parametro.valorMinimo <= valor) {
-                  aviso = true;
-                }
-                break;
-            }
-            switch (parametro.operadorMaximo) {
-              case '0':
-                if (parametro.valorMaximo > valor) {
-                  aviso = true;
-                }
-                break;
-              case '1':
-                if (parametro.valorMaximo >= valor) {
-                  aviso = true;
-                }
-                break;
-              case '2':
-                if (parametro.valorMaximo === valor) {
-                  aviso = true;
-                }
-                break;
-              case '3':
-                if (parametro.valorMaximo < valor) {
-                  aviso = true;
-                }
-                break;
-              case '4':
-                if (parametro.valorMaximo <= valor) {
-                  aviso = true;
-                }
-                break;
-            }
+    var sensor, parametro, usuario;
+
+    // Busca a informacao do sensor
+    await new Promise((resolve, reject) => {
+      Sensor.find({
+        where: {
+          guid: guid,
+        },
+        include: ['parametros', 'usuario'],
+      }, (err, sensores) => {
+        if (err) return reject(err);
+        if (sensores.length === 0) {
+          var error = new Error();
+          error.message = 'Sensor não encontrado';
+          error.status = 404;
+          return reject(error);
+        } else {
+          sensor = JSON.parse(JSON.stringify(sensores[0]));
+          parametro = sensor.parametros;
+          usuario = sensor.usuario;
+          resolve();
+        }
+      });
+    });
+
+    // Cria o log do Sensor
+    await new Promise((resolve, reject) => {
+      Logsensor.create({
+        sensorId: sensor.id,
+        valor: valor,
+      }, (err, res) => {
+        if (err) return reject(err);
+        if (res) resolve();
+      });
+    });
+
+    // Verifica o valor do sensor de acordo com o tipo
+    await new Promise((resolve, reject) => {
+      if (sensor.tipo === 1) {
+        Logsensor.sum(parametro.periodo, sensor.id, (err, res) => {
+          if (err) return reject(err);
+          if (res) {
+            valor = res[0].sum;
+            resolve();
           }
-
-          var result = {
-            status: 'OK',
-            acao: 0,
-          };
-          if (aviso) {
-            switch (parametro.acaoId) {
-              // Email
-              case 1:
-                emailService.sendEmail(usuario.email, parametro.descricao, `<p>Atenção! Seu sensor ${sensor.nome} ultrapassou os limites estabelicidos.</p>`);
-                break;
-                // Notificao
-              case 2:
-                var accountSid = 'AC7373bc6b787f770c828b7d03bdf2a958'; // Your Account SID from www.twilio.com/console
-                var authToken = '9e5385f89ef5c7ce6731c049b1f61975'; // Your Auth Token from www.twilio.com/console
-
-                var twilio = require('twilio');
-                var client = new twilio(accountSid, authToken);
-
-                client.messages.create({
-                    body: `Atenção! Seu sensor ${sensor.nome} ultrapassou os limites estabelicidos.`,
-                    to: usuario.telefone, // Text this number
-                    from: '+12342310601' // From a valid Twilio number
-                  })
-                  .then((message) => console.log(message.sid));
-                break;
-                // Desligar
-              case 3:
-                result = {
-                  status: 'OK',
-                  acao: 1,
-                };
-                break;
-            }
-          }
-          cb(null, result);
         });
+      } else {
+        resolve();
+      }
+    });
+
+    // Verifica se passou o parametro
+    await new Promise((resolve, reject) => {
+      var aviso = false;
+
+      switch (parametro.operadorMinimo) {
+        case '0':
+          if (parametro.valorMinimo > valor) {
+            aviso = true;
+          }
+          break;
+        case '1':
+          if (parametro.valorMinimo >= valor) {
+            aviso = true;
+          }
+          break;
+        case '2':
+          if (parametro.valorMinimo === valor) {
+            aviso = true;
+          }
+          break;
+        case '3':
+          if (parametro.valorMinimo < valor) {
+            aviso = true;
+          }
+          break;
+        case '4':
+          if (parametro.valorMinimo <= valor) {
+            aviso = true;
+          }
+          break;
+      }
+      switch (parametro.operadorMaximo) {
+        case '0':
+          if (parametro.valorMaximo > valor) {
+            aviso = true;
+          }
+          break;
+        case '1':
+          if (parametro.valorMaximo >= valor) {
+            aviso = true;
+          }
+          break;
+        case '2':
+          if (parametro.valorMaximo === valor) {
+            aviso = true;
+          }
+          break;
+        case '3':
+          if (parametro.valorMaximo < valor) {
+            aviso = true;
+          }
+          break;
+        case '4':
+          if (parametro.valorMaximo <= valor) {
+            aviso = true;
+          }
+          break;
+      }
+
+      var result = {
+        status: 'OK',
+        acao: 0,
       };
+      if (aviso) {
+        switch (parametro.acaoId) {
+          // Email
+          case 1:
+            emailService.sendEmail(usuario.email, parametro.descricao, `<p>Atenção! Seu sensor ${sensor.nome} ultrapassou os limites estabelicidos.</p>`);
+            break;
+            // Notificao
+          case 2:
+            var accountSid = 'AC7373bc6b787f770c828b7d03bdf2a958'; // Your Account SID from www.twilio.com/console
+            var authToken = '9e5385f89ef5c7ce6731c049b1f61975'; // Your Auth Token from www.twilio.com/console
+
+            var twilio = require('twilio');
+            var client = new twilio(accountSid, authToken);
+
+            client.messages.create({
+                body: `Atenção! Seu sensor ${sensor.nome} ultrapassou os limites estabelicidos.`,
+                to: usuario.telefone, // Text this number
+                from: '+12342310601' // From a valid Twilio number
+              })
+              .then((message) => console.log(message.sid));
+            break;
+            // Desligar
+          case 3:
+            result = {
+              status: 'OK',
+              acao: 1,
+            };
+            break;
+        }
+      }
+      cb(null, result);
     });
   };
 
@@ -166,5 +193,56 @@ module.exports = function (Logsensor) {
     }
     next();
   });
+
+  Logsensor.remoteMethod('sum', {
+    accepts: [{
+        arg: 'periodo',
+        type: 'number',
+        required: true,
+      },
+      {
+        arg: 'sensorId',
+        type: 'number',
+        required: true,
+      }
+    ],
+    returns: {
+      arg: 'data',
+      type: 'string',
+    },
+    http: {
+      verb: 'post',
+    },
+  });
+
+  Logsensor.sum = function (periodo, sensorId, cb) {
+    var today = new Date(Date.now());
+    var startDate = '';
+    var endDate = '';
+    var ds = Logsensor.dataSource;
+    var params = [];
+    var sql = ` select
+                  sum(logsensor.valor)
+                from
+                  logsensor
+                where data between $1 and $2 and sensorid = $3`;
+    switch (periodo) {
+      case 0:
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        break;
+      case 1:
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+        break;
+    }
+    params.push(startDate);
+    params.push(endDate);
+    params.push(sensorId);
+    ds.connector.query(sql, params, function (err, res) {
+      if (err) console.error(err);
+      cb(err, res);
+    });
+  }
 
 };

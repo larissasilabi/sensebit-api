@@ -22,7 +22,7 @@ module.exports.sendEmail = (email, assunto, mensagem) => {
     if (err) {
       console.log(err);
     } else {
-      console.log(info);
+      console.log(`Email Enviado para ${email}! `);
     }
   });
 };

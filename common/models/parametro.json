@@ -14,6 +14,10 @@
     "descricao": {
       "type": "string"
     },
+    "periodo": {
+      "type": "number",
+      "default": 0
+    },
     "operadorMinimo": {
       "type": "string",
       "required": true
