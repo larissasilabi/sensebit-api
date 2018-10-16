@@ -15,8 +15,15 @@
       "type": "date",
       "required": true
     },
+    "valido": {
+      "type": "boolean",
+      "required": true
+    },
     "valor": {
       "type": "number",
+      "postgresql": {
+        "dataType": "Numeric"
+      },
       "required": true
     }
   },

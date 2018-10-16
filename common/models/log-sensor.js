@@ -46,6 +46,7 @@ module.exports = function (Logsensor) {
       Logsensor.create({
         sensorId: sensor.id,
         valor: valor,
+        valido: true,
       }, (err, res) => {
         if (err) return reject(err);
         if (res) resolve();
@@ -70,7 +71,6 @@ module.exports = function (Logsensor) {
     // Verifica se passou o parametro
     await new Promise((resolve, reject) => {
       var aviso = false;
-
       switch (parametro.operadorMinimo) {
         case '0':
           if (parametro.valorMinimo > valor) {
@@ -131,6 +131,7 @@ module.exports = function (Logsensor) {
         acao: 0,
       };
       if (aviso) {
+        console.log('aviso ativo')
         switch (parametro.acaoId) {
           // Email
           case 1:
@@ -225,7 +226,7 @@ module.exports = function (Logsensor) {
                   sum(logsensor.valor)
                 from
                   logsensor
-                where data between $1 and $2 and sensorid = $3`;
+                where data between $1 and $2 and sensorid = $3 and valido = true`;
     switch (periodo) {
       case 0:
         startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
@@ -242,6 +243,62 @@ module.exports = function (Logsensor) {
     ds.connector.query(sql, params, function (err, res) {
       if (err) console.error(err);
       cb(err, res);
+    });
+  }
+
+  Logsensor.remoteMethod('reset', {
+    accepts: [{
+      arg: 'guid',
+      type: 'string',
+      required: true,
+    }],
+    returns: {
+      arg: 'data',
+      type: 'string',
+    },
+    http: {
+      verb: 'post',
+    },
+  });
+
+  Logsensor.reset = async function (guid, cb) {
+    var Sensor = app.models.Sensor;
+    var sensor;
+
+    // Busca a informacao do sensor
+    await new Promise((resolve, reject) => {
+      Sensor.find({
+        where: {
+          guid: guid,
+        },
+      }, (err, sensores) => {
+        if (err) return reject(err);
+        if (sensores.length === 0) {
+          var error = new Error();
+          error.message = 'Sensor não encontrado';
+          error.status = 404;
+          return reject(error);
+        } else {
+          sensor = JSON.parse(JSON.stringify(sensores[0]));
+          resolve();
+        }
+      });
+    });
+
+    // Atualiza a info
+    await new Promise((resolve, reject) => {
+      Logsensor.updateAll({
+        sensorId: sensor.id
+      }, {
+        valido: false
+      }, function (err, items) {
+        if (err) {
+          cb(err)
+        } else {
+          console.log('updated', items);
+          cb(null)
+        }
+      });
     });
   }
 
