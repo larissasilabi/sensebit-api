@@ -43,11 +43,6 @@
   },
   "validations": [],
   "relations": {
-    "acoes": {
-      "type": "hasOne",
-      "model": "acao",
-      "foreignKey": "acaoId"
-    },
     "sensor": {
       "type": "hasOne",
       "model": "sensor",

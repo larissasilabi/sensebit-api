@@ -6,7 +6,7 @@ module.exports = function updateCustomModels(app, next) {
     return next();
   }
 
-  const models = ['RoleMapping', 'Role', 'acao', 'logAcao', 'logSensor', 'parametro', 'sensor', 'usuario'];
+  const models = ['RoleMapping', 'Role', 'acao', 'logSensor', 'parametro', 'sensor', 'usuario'];
 
     // reference to our datasource
   const postgres = app.dataSources.postgres;

@@ -41,12 +41,6 @@
       "foreignKey": "sensorId",
       "through": "logSensor"
     },
-    "logAcoes": {
-      "type": "hasMany",
-      "model": "logAcao",
-      "foreignKey": "sensorId",
-      "through": "logAcao"
-    },
     "usuario": {
       "type": "hasOne",
       "model": "usuario",

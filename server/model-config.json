@@ -54,9 +54,5 @@
   "acao": {
     "dataSource": "postgres",
     "public": true
-  },
-  "logAcao": {
-    "dataSource": "postgres",
-    "public": true
   }
 }

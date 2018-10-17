@@ -16,7 +16,8 @@ module.exports = function (Logsensor) {
   Logsensor.sendInformation = async function (guid, valor, cb) {
 
     var Sensor = app.models.Sensor;
-    var sensor, parametro, usuario;
+    var Acao = app.models.Acao;
+    var sensor, parametro, usuario, enviou;
 
     // Busca a informacao do sensor
     await new Promise((resolve, reject) => {
@@ -50,6 +51,20 @@ module.exports = function (Logsensor) {
       }, (err, res) => {
         if (err) return reject(err);
         if (res) resolve();
+      });
+    });
+
+    // Verifica se ja enviou o aviso no periodo
+    await new Promise((resolve, reject) => {
+      enviou = false;
+      Logsensor.checkAcao(parametro.periodo, sensor.id, (err, res) => {
+        if (err) return reject(err);
+        if (res) {
+          if (res[0].count >= 1) {
+            enviou = true;
+          }
+          resolve();
+        }
       });
     });
 
@@ -130,7 +145,7 @@ module.exports = function (Logsensor) {
         status: 'OK',
         acao: 0,
       };
-      if (aviso) {
+      if (aviso && !enviou) {
         console.log('aviso ativo')
         switch (parametro.acaoId) {
           // Email
@@ -160,6 +175,14 @@ module.exports = function (Logsensor) {
             };
             break;
         }
+        Acao.create({
+          sensorId: sensor.id,
+          acaoId: parametro.acaoId,
+          data: new Date(),
+          status: true
+        }, (err, res) => {
+          if (err) cb(err);
+        });
       }
       cb(null, result);
     });
@@ -263,6 +286,7 @@ module.exports = function (Logsensor) {
 
   Logsensor.reset = async function (guid, cb) {
     var Sensor = app.models.Sensor;
+    var Acao = app.models.Acao;
     var sensor;
 
     // Busca a informacao do sensor
@@ -293,13 +317,60 @@ module.exports = function (Logsensor) {
         valido: false
       }, function (err, items) {
         if (err) {
+          return reject (err)
+        } else {
+          console.log('LogSensor ' + sensor.nome + ' resetado com sucesso!');
+          resolve()
+        }
+      });
+    });
+
+     // Atualiza a info
+     await new Promise((resolve, reject) => {
+      Acao.updateAll({
+        sensorId: sensor.id
+      }, {
+        status: false
+      }, function (err, items) {
+        if (err) {
           cb(err)
         } else {
-          console.log('updated', items);
+          console.log('Acao ' + sensor.nome + ' resetado com sucesso!');
           cb(null)
         }
       });
     });
   }
+
+  Logsensor.checkAcao = function(periodo, sensorId, cb) {
+    // Verifica se ja enviou o aviso no periodo
+    var today = new Date(Date.now());
+    var startDate = '';
+    var endDate = '';
+    var ds = Logsensor.dataSource;
+    var params = [];
+    var sql = ` select
+                        count(1)
+                      from
+                        acao
+                      where data between $1 and $2 and sensorid = $3 and status = true`;
+    switch (periodo) {
+      case 0:
+        startDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+        break;
+      case 1:
+        startDate = new Date(today.getFullYear(), today.getMonth(), 1, 0, 0, 0);
+        endDate = new Date(today.getFullYear(), today.getMonth() + 1, 0, 23, 59, 59);
+        break;
+    }
+    params.push(startDate);
+    params.push(endDate);
+    params.push(sensorId);
+    ds.connector.query(sql, params, function (err, res) {
+      if (err) console.log(err);
+      cb(null, res)
+    });
+  };
 
 };

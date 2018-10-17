@@ -7,24 +7,25 @@
     "validateUpsert": true
   },
   "properties": {
-    "tipo": {
+    "sensorId": {
       "type": "number",
       "required": true
     },
-    "configuracao": {
-      "type": "string",
+    "acaoId": {
+      "type": "number",
+      "required": true
+    },
+    "data": {
+      "type": "date",
+      "required": true
+    },
+    "status": {
+      "type": "boolean",
       "required": true
     }
   },
   "validations": [],
-  "relations": {
-    "logAcoes": {
-      "type": "hasMany",
-      "model": "logAcao",
-      "foreignKey": "acaoId",
-      "through": "logAcao"
-    }
-  },
+  "relations": {},
   "acls": [],
   "methods": {}
 }

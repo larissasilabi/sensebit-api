@@ -24,6 +24,7 @@ module.exports = function (Sensor) {
       guid: uuid.v4(),
       usuarioId: data.usuarioId,
       status: data.status,
+      nome: data.nome,
     }, (err, pagamento) => {
       if (err) cb(err);
       if (pagamento) {
